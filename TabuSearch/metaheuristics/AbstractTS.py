@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import deque
+from problems.Evaluator import Evaluator
 
 # Type variable for generic candidate element
 
@@ -15,7 +16,7 @@ class AbstractTS(ABC):
 	import random
 	rng = random.Random(0)
 
-	def __init__(self, obj_function, tenure: int, iterations: int):
+	def __init__(self, obj_function: Evaluator, tenure: int, iterations: int):
 		"""
 		Constructor for the AbstractTS class.
 		Args:

@@ -1,5 +1,5 @@
 from .Evaluator import Evaluator
-from GRASP.Solution import Solution
+from TabuSearch.Solution import Solution
 from .QBF import QBF
 from .SetCover import SetCover as SC
 

@@ -1,6 +1,6 @@
-from GRASP import Solution
-from GRASP.metaheuristics import AbstractGRASP, ReactiveGRASP
-from GRASP.problems import Evaluator, QBF, SC_QBF, SetCover
+from TabuSearch import Solution
+from TabuSearch.metaheuristics import *
+from TabuSearch.problems import *
 
 
 def main():
@@ -35,7 +35,7 @@ def main():
 
     # Model creation
 
-    solver = ReactiveGRASP(
+    solver = TS(
         obj_function = SC_QBF(n, A, sets),
         iterations=10,
         alpha_pool= [0.8],
