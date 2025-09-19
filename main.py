@@ -1,5 +1,6 @@
 from TabuSearch import Solution
 from TabuSearch.metaheuristics import *
+from TabuSearch.metaheuristics.TS import TS
 from TabuSearch.problems import *
 
 
@@ -34,11 +35,11 @@ def main():
                 A[j][i] = upper_A[i][j]
 
     # Model creation
-
+    #TODO Implement TS
     solver = TS(
         obj_function = SC_QBF(n, A, sets),
         iterations=10,
-        alpha_pool= [0.8],
+        tenure=7,
         constructive_type='cost_ratio',
         search_type='first'
     )

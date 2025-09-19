@@ -20,9 +20,9 @@ class SC_QBF(Evaluator):
     def is_feasible(self, sol: Solution) -> bool:
         return sol and sol.elements and self.SC.is_feasible(sol)
 
-    def evaluate(self, sol: Solution, allow_partial: bool = True) -> float:
-        if not self.is_feasible(sol) and not allow_partial:
-            sol.cost = float("-inf")
+    def evaluate(self, sol: Solution) -> float:
+        if not self.is_feasible(sol):
+            sol.cost = float("-inf") if self.maximize else float("inf")
             return sol.cost
 
         covered = sorted(self.SC.coverage(sol))
