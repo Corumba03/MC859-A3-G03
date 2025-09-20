@@ -10,8 +10,9 @@ class TS(AbstractTS):
     """
 
     def __init__(self, obj_function: Evaluator, 
-                 tenure: int = 7, 
-                 iterations: int = 5,
+                 tenure: int = 0, 
+                 no_improv_iter: int = 5,
+                 max_iter: int = 100,
                  maximize: bool = True,
                  tabu_size: int = 0,
                  search_type: str = 'first',
@@ -22,11 +23,12 @@ class TS(AbstractTS):
         Args:
             obj_function: The objective function being maximized.
             tenure: The Tabu tenure parameter.
-            iterations: The number of iterations which the TS will be executed.
+            no_improv_iter: The number of iterations without improvement to stop the search.
+            max_iter: The maximum number of iterations for the search.
             constructive_type: The type of constructive heuristic to use ('random' or 'cost_ratio').
             search_type: The type of local search to use ('first' or 'best').
         """
-        super().__init__(obj_function, tenure, iterations, maximize=maximize, constructive_type=constructive_type)
+        super().__init__(obj_function, tenure, no_improv_iter, max_iter, maximize=maximize, constructive_type=constructive_type)
         self.tabu_size = tabu_size
         self.tabu_check = tabu_check
         self.search_type = search_type

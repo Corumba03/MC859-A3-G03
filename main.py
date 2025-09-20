@@ -37,7 +37,8 @@ def main():
     
     solver = TS(
         obj_function = SC_QBF(n, A, sets),
-        iterations=5,
+        no_improv_iter=5,
+        max_iter=100,
         tenure=0,
         constructive_type='std',
         search_type='first',

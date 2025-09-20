@@ -17,7 +17,8 @@ class AbstractTS(ABC):
 
 	def __init__(self, obj_function: Evaluator, 
 			  		tenure: int = 0, 
-					iterations: int = 3, 
+					no_improv_iter: int = 5,
+					max_iter: int = 100,
 					maximize: bool = True,
 					constructive_type: str = 'std'):
 		"""
@@ -25,11 +26,15 @@ class AbstractTS(ABC):
 		Args:
 			obj_function: The objective function being minimized.
 			tenure: The Tabu tenure parameter.
-			iterations: The number of iterations which the TS will be executed.
+			no_improv_iter: The number of iterations without improvement to stop the search.
+			max_iter: The maximum number of iterations for the search.
+			maximize: Whether the objective function is to be maximized (True) or minimized (
+			constructive_type: The type of constructive heuristic to use ('std' for standard).
 		"""
 		# Iniatialize basic parameters of the solver
 		self.obj_function = obj_function
-		self.iterations = iterations # Iterations without improvement
+		self.no_improv_iter = no_improv_iter # Iterations without improvement
+		self.max_iter = max_iter # Maximum number of iterations
 		self.maximize = maximize
 		self.constructive_type = constructive_type
 
@@ -186,7 +191,7 @@ class AbstractTS(ABC):
 		no_improv = 0
 		i = 0
 
-		while no_improv < self.iterations:
+		while no_improv < self.no_improv_iter and i < self.max_iter:
 			# Apply a neighborhood move to the current solution
 			self.neighborhood_move()
 
