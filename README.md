@@ -17,4 +17,4 @@ tabu_check: Choose between 'strict' (to tabu any moves using the element tabu) o
 
 2) Set the 'minutes' variable in runner.py to specify the maximum amount of minutes before a timeout
 
-3) Run runner.py
+3) Put the all the instances on the 'instances' folder, run runner.py then check the results on the folder 'logs' that will be generated
