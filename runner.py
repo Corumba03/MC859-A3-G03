@@ -3,6 +3,8 @@ import time
 import os
 import glob
 
+minutes = 1 # You can change this value to set the desired number of minutes before timeout
+
 def main():
     input_dir = "instances"   # Directory where input .txt files are stored
     log_dir = "logs"          # Directory where log files will be written
@@ -15,7 +17,7 @@ def main():
         except Exception as e:
             print(f"Warning: Could not remove {f}: {e}")
 
-    t_out = 60*30 # Time limit for each instance
+    t_out = 60 * minutes  # Time limit for each instance in seconds
 
     # Collect all .txt files from input_dir, sorted alphabetically
     files = sorted(glob.glob(os.path.join(input_dir, "*.txt")))

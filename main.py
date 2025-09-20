@@ -1,7 +1,6 @@
 from TabuSearch import Solution
-from TabuSearch.metaheuristics import *
-from TabuSearch.metaheuristics.TS import TS
-from TabuSearch.problems import *
+from TabuSearch.metaheuristics import AbstractTS, TS
+from TabuSearch.problems import SC_QBF
 
 
 def main():
@@ -35,23 +34,20 @@ def main():
                 A[j][i] = upper_A[i][j]
 
     # Model creation
-    #TODO Implement TS
+    
     solver = TS(
         obj_function = SC_QBF(n, A, sets),
-        iterations=10,
-        tenure=7,
-        constructive_type='cost_ratio',
-        search_type='first'
+        iterations=5,
+        tenure=0,
+        constructive_type='std',
+        search_type='first',
+        tabu_check='relaxed'
     )
 
-    solutions = solver.solve()
+    solution = solver.solve()
 
-    for i, sol in enumerate(solutions):
-        if i == len(solutions) - 1:
-            print(f"\nFinal {sol}")
-        else:
-            print(f"(Iter. {i+1}) BestSol = {sol}")
-    
+
+    print(f"\nFinal {solution}")
 
 
 if __name__=='__main__':

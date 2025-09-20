@@ -10,26 +10,32 @@ class SC_QBF(Evaluator):
     while ensuring full coverage.
     """
 
-    def __init__(self, n: int, A: list[list[float]], sets: list[set[int]]):
+    def __init__(self, n: int, 
+                 A: list[list[float]], 
+                 sets: list[set[int]],
+                 maximize: bool = True):
         self.n = n
         self.A = A
         self.sets = sets
+        self.maximize = maximize
 
         self.SC = SC(sets, n)
 
     def is_feasible(self, sol: Solution) -> bool:
-        return sol and sol.elements and self.SC.is_feasible(sol)
+        return self.SC.is_feasible(sol)
 
     def evaluate(self, sol: Solution) -> float:
         if not self.is_feasible(sol):
             sol.cost = float("-inf") if self.maximize else float("inf")
             return sol.cost
 
-        covered = sorted(self.SC.coverage(sol))
         cost = 0.0
-        for idx_i, i in enumerate(covered):
-            for j in covered[idx_i:]:
-                cost += self.A[i][j]
+        for i in sol:
+            for j in sol:
+                if i <= j:  # Only sum upper triangle (i <= j)
+                    cost += self.A[i][j]
+            cost += self.A[i][i] # Diagonal term
+        
         sol.cost = cost
         return cost
 
@@ -37,39 +43,37 @@ class SC_QBF(Evaluator):
         if elem in sol:
             return 0.0
 
-        current_vars = self.SC.coverage(sol)
-        new_vars = self.sets[elem] - current_vars
-        if not new_vars:
-            return 0.0
-
         # Only sum upper triangle (i <= j)
-        all_vars = sorted(current_vars | new_vars)
         delta = 0.0
-        for idx_i, i in enumerate(all_vars):
-            for j in all_vars[idx_i:]:
-                # Only add if i or j is in new_vars (i.e., new contribution)
-                if i in new_vars or j in new_vars:
-                    delta += self.A[i][j]
+        for var in sol.elements:
+            if var < elem:
+                delta += self.A[var][elem]
+            if var > elem:
+                delta += self.A[elem][var]
+        delta += self.A[elem][elem]
+
         return delta
 
     def evaluate_removal_cost(self, elem: int, sol: Solution) -> float:
         if elem not in sol:
             return 0.0
 
-        current_vars = self.SC.coverage(sol)
-        removed_vars = self.sets[elem] & current_vars
-        remaining_vars = sorted(current_vars - removed_vars)
-
         # Only allow removal if still feasible
         if not self.SC.is_feasible(sol.remove(elem)):
-            return float("-inf")
+            return float("-inf") if self.maximize else float("inf")
+
+        current_vars = sol.elements
+        removed_vars = current_vars - sol.elements
 
         # Only sum upper triangle (i <= j)
         delta = 0.0
-        for idx_i, i in enumerate(current_vars):
-            for j in current_vars[idx_i:]:
-                if i in removed_vars or j in removed_vars:
-                    delta -= self.A[i][j]
+        for var in sol.elements:
+            if var < elem:
+                delta -= self.A[var][elem]
+            if var > elem:
+                delta -= self.A[elem][var]
+        delta -= self.A[elem][elem]
+
         return delta
 
     def evaluate_exchange_cost(self, elem_in: int, elem_out: int, sol: Solution) -> float:
@@ -78,7 +82,7 @@ class SC_QBF(Evaluator):
 
         sol_after_removal = sol.remove(elem_out)
         if not self.SC.is_feasible(sol_after_removal.insert(elem_in)):
-            return float("-inf")
+            return float("-inf") if self.maximize else float("inf")
 
         # Compute insertion and removal deltas using upper triangle logic
         delta = self.evaluate_removal_cost(elem_out, sol)

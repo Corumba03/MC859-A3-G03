@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import random
 from collections import deque
 from TabuSearch.Solution import Solution
-from problems.Evaluator import Evaluator
+from ..problems.Evaluator import Evaluator
 
 # Type variable for generic candidate element
 
@@ -15,7 +15,11 @@ class AbstractTS(ABC):
 	verbose: bool = True
 
 
-	def __init__(self, obj_function: Evaluator, tenure: int, iterations: int = 3, maximize: bool = True):
+	def __init__(self, obj_function: Evaluator, 
+			  		tenure: int = 0, 
+					iterations: int = 3, 
+					maximize: bool = True,
+					constructive_type: str = 'std'):
 		"""
 		Constructor for the AbstractTS class.
 		Args:
@@ -24,20 +28,22 @@ class AbstractTS(ABC):
 			iterations: The number of iterations which the TS will be executed.
 		"""
 		# Iniatialize basic parameters of the solver
-		self.objFunction = obj_function
+		self.obj_function = obj_function
 		self.iterations = iterations # Iterations without improvement
 		self.maximize = maximize
+		self.constructive_type = constructive_type
 
 		# Size of the tabu list, if tenure <= 0, use domain size as tenure otherwise use domain size // tenure (ratio)
 		self.tenure = obj_function.get_domain_size() if tenure <= 0 else obj_function.get_domain_size() // tenure
-		self.TL: deque = deque()
+		self.TL_deq: deque = deque()
+		self.TL_dict: dict = {}
 
 		# Initialize the solution, Candidate List, and Restricted Candidate List
 		self.sol = None
-		self.last_cost: float = float('-inf') if maximize else float('inf')
+		self.last_sol = None
 		self.CL = None
 		self.RCL = None
-		self.bestSol = None
+		self.best_sol = None
 
 	@abstractmethod
 	def make_CL(self) -> list:
@@ -120,11 +126,11 @@ class AbstractTS(ABC):
 			True if the current solution did not improve.
 		"""
 		if self.maximize:
-			return self.cost < self.last_cost
+			return self.sol.cost < self.last_sol.cost
 		else:
-			return self.cost > self.last_cost
+			return self.sol.cost > self.last_sol.cost
 
-	def constructive_heuristic(self) -> Solution:
+	def constructive_heuristic_std(self) -> Solution:
 		"""
 		The TS constructive heuristic, which is responsible for building a feasible solution by selecting candidate elements to enter the solution.
 		Returns:
@@ -135,26 +141,30 @@ class AbstractTS(ABC):
 		self.sol = self.create_empty_sol()
 		self.CL = self.make_CL()
 		self.RCL = self.make_RCL()
-		
+		self.last_sol = self.sol.copy()
 
 		# Main loop, which repeats until the stopping criteria is reached.
-		while self.constructive_stop_criteria():
-			self.last_cost = self.sol.cost
+		while not self.constructive_stop_criteria():
+			self.last_sol = self.sol.copy()
 			if not self.RCL:
 				break
 			
 			# Select a candidate element from the RCL (here we select randomly, but other strategies can be used)
 			selected = random.choice(list(self.RCL))
 			self.sol.add(selected)
-			self.objFunction.evaluate(self.sol)
-			
+			self.obj_function.evaluate(self.sol)
+
 			# Update the Candidate List and Restricted Candidate List
 			self.update_CL()
 			self.RCL = self.make_RCL()
-
-			if self.verbose:
-				print(f"Constructive Heuristic: Made removed {selected}, New Solution Cost: {self.sol.cost}")
-
+			
+		# Return the best solution found during the constructive phase
+		if self.last_sol.cost > self.sol.cost:
+			self.sol = self.last_sol.copy()
+		
+		if self.verbose:
+			print(f"Constructive Heuristic found solution: {self.sol}")
+		
 		return self.sol
 
 	def solve(self) -> Solution:
@@ -164,28 +174,41 @@ class AbstractTS(ABC):
 			The best feasible solution obtained throughout all iterations.
 		"""
 		# Initialize the best solution and Tabu List
-		self.bestSol = self.create_empty_sol()
+		self.best_sol = self.create_empty_sol()
 		self.TL = self.make_TL()
+		solutions = []
 
 		# Apply the constructive heuristic to find an initial solution
-		self.constructive_heuristic()
+		if self.constructive_type == 'std':
+			self.constructive_heuristic_std()
+
+		# Initialize no improvement counter and iteration counter
 		no_improv = 0
 		i = 0
 
 		while no_improv < self.iterations:
+			# Apply a neighborhood move to the current solution
 			self.neighborhood_move()
-			if self.maximize and self.sol.cost > self.bestSol.cost:
+
+			# Update the best solution found so far
+			if self.maximize and self.sol.cost > self.best_sol.cost:
 				# Assuming Solution has a copy constructor or similar
-				self.bestSol = self.sol.copy()
+				self.best_sol = self.sol.copy()
+				solutions.append(self.best_sol)
+				no_improv = 0
 				if self.verbose:
-					print(f"(Iter. {i}) BestSol = {self.bestSol}")
-			elif not self.maximize and self.sol.cost < self.bestSol.cost:
+					print(f"(Iter. {i}) best_sol = {self.best_sol}")
+			elif not self.maximize and self.sol.cost < self.best_sol.cost:
 				# Assuming Solution has a copy constructor or similar
-				self.bestSol = self.sol.copy()
+				self.best_sol = self.sol.copy()
+				solutions.append(self.best_sol)
+				no_improv = 0
 				if self.verbose:
-					print(f"(Iter. {i}) BestSol = {self.bestSol}")
+					print(f"(Iter. {i}) best_sol = {self.best_sol}")
 			else:
 				no_improv += 1
+				print(f"No improvement in iteration {i}. No improvement count: {no_improv}")
 			i += 1
-		return self.bestSol
+
+		return self.best_sol
 

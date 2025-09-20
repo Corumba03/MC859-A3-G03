@@ -22,14 +22,10 @@ class SetCover():
     def is_feasible(self, sol) -> bool:
         """
         Checks if a solution covers all required elements.
-        Accepts either a Solution object or an iterable of indices.
         """
-        if hasattr(sol, 'elements'):
-            indices = sol.elements
-        else:
-            indices = sol
+
         covered = set()
-        for i in indices:
+        for i in sol:
             covered.update(self.sets[i])
         return len(covered) == self.num_elements
 
