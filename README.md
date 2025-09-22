@@ -10,7 +10,7 @@ tenure: size of the Tabu list, leave as 0 for a dynamic size
 no_improv_iter: number of iterations without improvement before stopping
 max_iter: number of iterations before stopping 
 maximize (optional): False if you want to minimize the function, True otherwise (it is True by default)
-constructive_type: one of ['std']
+constructive_type: one of ['std', 'greedy', 'cost_ratio']
 search_type: Choose between 'first' (for first improving) or 'best' (for best improving)
 tabu_check: Choose between 'strict' (to tabu any moves using the element tabu) or 'relaxed' (to tabu only the specific move used)
 

@@ -283,8 +283,6 @@ class TS(AbstractTS):
         print(f'No improving move found, taking least bad move: {move}, solution cost: {least_bad.cost:.2f}')
         return least_bad, move
 
-        
-
     def neighborhood_move(self):
         """
         The TS local search phase is responsible for repeatedly applying a neighborhood operation 

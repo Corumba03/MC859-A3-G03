@@ -40,7 +40,7 @@ def main():
         no_improv_iter=5,
         max_iter=100,
         tenure=0,
-        constructive_type='std',
+        constructive_type='cost_ratio',
         search_type='first',
         tabu_check='relaxed'
     )

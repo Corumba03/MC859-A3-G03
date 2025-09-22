@@ -172,6 +172,60 @@ class AbstractTS(ABC):
 		
 		return self.sol
 
+	def constructive_heuristic_greedy(self) -> Solution:
+		"""
+		A greedy constructive heuristic that builds a solution by iteratively adding the best candidate element from the
+		Candidate List until a feasible solution is formed.
+		Returns:
+			A feasible solution to the problem.
+		"""
+		self.sol = self.create_empty_sol()
+		self.CL = self.make_CL()
+		
+		while not self.obj_function.is_feasible(self.sol):
+			best_elem = None
+			best_cost = None
+			for elem in self.CL:
+				delta = self.obj_function.evaluate_insertion_cost(elem, self.sol)
+				if best_elem is None or (self.maximize and delta > best_cost) or (not self.maximize and delta < best_cost):
+					best_elem = elem
+					best_cost = delta
+			self.sol.add(best_elem)
+			self.obj_function.evaluate(self.sol)
+			self.update_CL()
+
+		if self.verbose:
+			print(f"Greedy Heuristic: found solution {self.sol}")
+		return self.sol
+
+	def constructive_heuristic_cost_ratio(self) -> Solution:
+		"""
+		A cost-ratio constructive heuristic that builds a solution by iteratively adding the candidate element from the
+		Candidate List that has the best cost-to-coverage ratio until a feasible solution is formed
+		Returns:
+			A feasible solution to the problem.
+		"""
+		self.sol = self.create_empty_sol()
+		self.CL = self.make_CL()
+
+		while not self.obj_function.is_feasible(self.sol):
+			best_elem = None
+			best_ratio = None
+			for elem in self.CL:
+				cost = self.obj_function.evaluate_insertion_cost(elem, self.sol)
+				coverage = len(self.obj_function.sets[elem])
+				ratio = cost / coverage if coverage > 0 else float('inf') # Avoid division by zero
+				if best_elem is None or (self.maximize and ratio > best_ratio) or (not self.maximize and ratio < best_ratio):
+					best_elem = elem
+					best_ratio = ratio
+			self.sol.add(best_elem)
+			self.obj_function.evaluate(self.sol)
+			self.update_CL()
+
+		if self.verbose:
+			print(f"Cost-Ratio Heuristic: found solution {self.sol}")
+		return self.sol
+	
 	def solve(self) -> Solution:
 		"""
 		The TS mainframe. It consists of a constructive heuristic followed by a loop, in which each iteration a neighborhood move is performed on the current solution. The best solution is returned as result.
@@ -186,6 +240,10 @@ class AbstractTS(ABC):
 		# Apply the constructive heuristic to find an initial solution
 		if self.constructive_type == 'std':
 			self.constructive_heuristic_std()
+		elif self.constructive_type == 'greedy':
+			self.constructive_heuristic_greedy()
+		elif self.constructive_type == 'cost_ratio':
+			self.constructive_heuristic_cost_ratio()
 
 		# Initialize no improvement counter and iteration counter
 		no_improv = 0
