@@ -17,8 +17,7 @@ class AbstractTS(ABC):
 
 	def __init__(self, obj_function: Evaluator, 
 			  		tenure: int = 0, 
-					no_improv_iter: int = 5,
-					max_iter: int = 100,
+					no_improv_iter: int = 100,
 					maximize: bool = True,
 					constructive_type: str = 'std'):
 		"""
@@ -27,14 +26,12 @@ class AbstractTS(ABC):
 			obj_function: The objective function being minimized.
 			tenure: The Tabu tenure parameter.
 			no_improv_iter: The number of iterations without improvement to stop the search.
-			max_iter: The maximum number of iterations for the search.
-			maximize: Whether the objective function is to be maximized (True) or minimized (
-			constructive_type: The type of constructive heuristic to use ('std' for standard).
+			maximize: Whether the objective function is to be maximized (True) or minimized (False).
+			constructive_type: The type of constructive heuristic to use ('std', 'cost_ratio', or 'greedy').
 		"""
 		# Iniatialize basic parameters of the solver
 		self.obj_function = obj_function
 		self.no_improv_iter = no_improv_iter # Iterations without improvement
-		self.max_iter = max_iter # Maximum number of iterations
 		self.maximize = maximize
 		self.constructive_type = constructive_type
 
@@ -49,6 +46,7 @@ class AbstractTS(ABC):
 		self.CL = None
 		self.RCL = None
 		self.best_sol = None
+		self.no_improv = 0
 
 	@abstractmethod
 	def make_CL(self) -> list:
@@ -246,10 +244,10 @@ class AbstractTS(ABC):
 			self.constructive_heuristic_cost_ratio()
 
 		# Initialize no improvement counter and iteration counter
-		no_improv = 0
+		self.no_improv = 0
 		i = 0
 
-		while no_improv < self.no_improv_iter and i < self.max_iter:
+		while self.no_improv < self.no_improv_iter:
 			# Apply a neighborhood move to the current solution
 			self.neighborhood_move()
 
@@ -258,19 +256,19 @@ class AbstractTS(ABC):
 				# Assuming Solution has a copy constructor or similar
 				self.best_sol = self.sol.copy()
 				solutions.append(self.best_sol)
-				no_improv = 0
+				self.no_improv = 0
 				if self.verbose:
 					print(f"(Iter. {i}) best_sol = {self.best_sol}")
 			elif not self.maximize and self.sol.cost < self.best_sol.cost:
 				# Assuming Solution has a copy constructor or similar
 				self.best_sol = self.sol.copy()
 				solutions.append(self.best_sol)
-				no_improv = 0
+				self.no_improv = 0
 				if self.verbose:
 					print(f"(Iter. {i}) best_sol = {self.best_sol}")
 			else:
-				no_improv += 1
-				print(f"No improvement in iteration {i}. No improvement count: {no_improv}")
+				self.no_improv += 1
+				print(f"No improvement in iteration {i}. No improvement count: {self.no_improv}")
 			i += 1
 
 		return self.best_sol

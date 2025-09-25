@@ -13,6 +13,7 @@ maximize (optional): False if you want to minimize the function, True otherwise 
 constructive_type: one of ['std', 'greedy', 'cost_ratio']
 search_type: Choose between 'first' (for first improving) or 'best' (for best improving)
 tabu_check: Choose between 'strict' (to tabu any moves using the element tabu) or 'relaxed' (to tabu only the specific move used)
+alt_strategy: Choose between 'intesification' to apply Intensification by Restart or 'diversification' to apply Diversification by Restart (None by default)
 
 
 2) Set the 'minutes' variable in runner.py to specify the maximum amount of minutes before a timeout

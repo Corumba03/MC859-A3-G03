@@ -37,12 +37,12 @@ def main():
     
     solver = TS(
         obj_function = SC_QBF(n, A, sets),
-        no_improv_iter=5,
-        max_iter=100,
+        no_improv_iter=100,
         tenure=0,
-        constructive_type='cost_ratio',
+        constructive_type='std',
         search_type='first',
-        tabu_check='relaxed'
+        tabu_check='relaxed',
+        alt_strategy='diversification'
     )
 
     solution = solver.solve()

@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import random
 from collections import deque
 from .AbstractTS import AbstractTS
 from TabuSearch.Solution import Solution
@@ -11,29 +12,32 @@ class TS(AbstractTS):
 
     def __init__(self, obj_function: Evaluator, 
                  tenure: int = 0, 
-                 no_improv_iter: int = 5,
-                 max_iter: int = 100,
+                 no_improv_iter: int = 100,
                  maximize: bool = True,
                  tabu_size: int = 0,
                  search_type: str = 'first',
                  constructive_type: str = 'std',
-                 tabu_check: str = 'strict'):
+                 tabu_check: str = 'strict',
+                 alt_strategy: str = None):
         """
         Constructor for the TS class.
         Args:
             obj_function: The objective function being maximized.
             tenure: The Tabu tenure parameter.
             no_improv_iter: The number of iterations without improvement to stop the search.
-            max_iter: The maximum number of iterations for the search.
             constructive_type: The type of constructive heuristic to use ('random' or 'cost_ratio').
             search_type: The type of local search to use ('first' or 'best').
+            tabu_check: The type of tabu check to use ('strict' or 'relaxed').
+            alt_strategy: The alternative strategy to use when no improving move is found ('intensification' or 'diversification').
         """
-        super().__init__(obj_function, tenure, no_improv_iter, max_iter, maximize=maximize, constructive_type=constructive_type)
+        super().__init__(obj_function, tenure, no_improv_iter, maximize=maximize, constructive_type=constructive_type)
         self.tabu_size = tabu_size
         self.tabu_check = tabu_check
         self.search_type = search_type
         self.constructive_type = constructive_type
-    
+        self.alt_strategy = alt_strategy
+
+
     def create_empty_sol(self):
         """
         Creates a new solution which is empty, i.e., does not contain any candidate solution element.
@@ -283,6 +287,22 @@ class TS(AbstractTS):
         print(f'No improving move found, taking least bad move: {move}, solution cost: {least_bad.cost:.2f}')
         return least_bad, move
 
+    def create_random_sol(self):
+        """
+        Creates a random solution for diversification.
+        Returns:
+            A random solution.
+        """
+        random_sol = self.create_empty_sol()
+        domain_size = self.obj_function.get_domain_size()
+        # Randomly activate subsets (variables) while respecting constraints
+        while not self.obj_function.is_feasible(random_sol):
+            for elem in range(domain_size):
+                if random.choice([True, False]):
+                    random_sol.add(elem)
+        self.obj_function.evaluate(random_sol)
+        return random_sol
+
     def neighborhood_move(self):
         """
         The TS local search phase is responsible for repeatedly applying a neighborhood operation 
@@ -293,7 +313,6 @@ class TS(AbstractTS):
         Returns:
             A local optimum solution.
         """
-        
         neighborhood = self.get_neighborhood(self.sol)
         best_candidate = None
 
@@ -304,10 +323,19 @@ class TS(AbstractTS):
             best_candidate, move = self.local_search_first(neighborhood)
 
         # Move to the best candidate (if any) and update the Tabu List
-        if best_candidate:
+        if self.alt_strategy and self.no_improv % (self.no_improv_iter // 5) == 0:
+            # If there's no improving move and we've had no improvement for half the allowed iterations, restart the search
+            if self.alt_strategy == 'intensification':
+                print("Intensification: Restarting from the best solution found so far.")
+                self.sol = self.best_sol.copy()
+            elif self.alt_strategy == 'diversification':
+                print("Diversification: Restarting from a random solution.")
+                self.sol = self.create_random_sol()
+        elif best_candidate.cost != self.sol.cost:
             self.sol = best_candidate.copy()
             self.update_TL(move)
-    
 
-       
+            # Update the best solution found so far
+            if (self.maximize and self.sol.cost > self.best_sol.cost) or (not self.maximize and self.sol.cost < self.best_sol.cost):
+                self.best_sol = self.sol.copy()
         
