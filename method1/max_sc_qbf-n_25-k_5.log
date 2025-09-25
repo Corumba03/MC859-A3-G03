@@ -1,0 +1,78 @@
+Cost-Ratio Heuristic: found solution Solution: cost=[100.87], size=[8], elements={2, 3, 4, 9, 12, 14, 15, 17}
+No improving move found, taking least bad move: (8, -1), solution cost: 108.05
+(Iter. 0) best_sol = Solution: cost=[108.05], size=[9], elements={2, 3, 4, 8, 9, 12, 14, 15, 17}
+No improving move found, taking least bad move: (16, -1), solution cost: 122.27
+(Iter. 1) best_sol = Solution: cost=[122.27], size=[10], elements={2, 3, 4, 8, 9, 12, 14, 15, 16, 17}
+No improving move found, taking least bad move: (1, -1), solution cost: 136.78
+(Iter. 2) best_sol = Solution: cost=[136.78], size=[11], elements={1, 2, 3, 4, 8, 9, 12, 14, 15, 16, 17}
+No improving move found, taking least bad move: (20, -1), solution cost: 146.62
+(Iter. 3) best_sol = Solution: cost=[146.62], size=[12], elements={1, 2, 3, 4, 8, 9, 12, 14, 15, 16, 17, 20}
+No improving move found, taking least bad move: (22, -1), solution cost: 154.11
+(Iter. 4) best_sol = Solution: cost=[154.11], size=[13], elements={1, 2, 3, 4, 8, 9, 12, 14, 15, 16, 17, 20, 22}
+No improving move found, taking least bad move: (6, -1), solution cost: 158.01
+(Iter. 5) best_sol = Solution: cost=[158.01], size=[14], elements={1, 2, 3, 4, 6, 8, 9, 12, 14, 15, 16, 17, 20, 22}
+No improving move found, taking least bad move: (24, -1), solution cost: 158.01
+No improvement in iteration 6. No improvement count: 1
+No improving move found, taking least bad move: (18, 6), solution cost: 156.89
+No improvement in iteration 7. No improvement count: 2
+No improving move found, taking least bad move: (23, -1), solution cost: 155.41
+No improvement in iteration 8. No improvement count: 3
+No improving move found, taking least bad move: (10, -1), solution cost: 152.89
+No improvement in iteration 9. No improvement count: 4
+No improving move found, taking least bad move: (2, 22), solution cost: 150.52
+No improvement in iteration 10. No improvement count: 5
+No improving move found, taking least bad move: (3, 17), solution cost: 150.40
+No improvement in iteration 11. No improvement count: 6
+No improving move found, taking least bad move: (4, 15), solution cost: 150.08
+No improvement in iteration 12. No improvement count: 7
+No improving move found, taking least bad move: (9, 20), solution cost: 148.17
+No improvement in iteration 13. No improvement count: 8
+No improving move found, taking least bad move: (21, -1), solution cost: 148.16
+No improvement in iteration 14. No improvement count: 9
+No improving move found, taking least bad move: (0, -1), solution cost: 148.04
+No improvement in iteration 15. No improvement count: 10
+No improving move found, taking least bad move: (-1, 2), solution cost: 147.36
+No improvement in iteration 16. No improvement count: 11
+No improving move found, taking least bad move: (-1, 12), solution cost: 140.18
+No improvement in iteration 17. No improvement count: 12
+No improving move found, taking least bad move: (5, -1), solution cost: 138.42
+No improvement in iteration 18. No improvement count: 13
+No improving move found, taking least bad move: (19, -1), solution cost: 136.67
+No improvement in iteration 19. No improvement count: 14
+No improving move found, taking least bad move: (-1, 9), solution cost: 136.65
+No improvement in iteration 20. No improvement count: 15
+No improving move found, taking least bad move: (12, 16), solution cost: 135.89
+No improvement in iteration 21. No improvement count: 16
+No improving move found, taking least bad move: (11, -1), solution cost: 134.59
+No improvement in iteration 22. No improvement count: 17
+No improving move found, taking least bad move: (-1, 8), solution cost: 129.55
+No improvement in iteration 23. No improvement count: 18
+No improving move found, taking least bad move: (-1, 1), solution cost: 126.00
+No improvement in iteration 24. No improvement count: 19
+No improving move found, taking least bad move: (13, -1), solution cost: 123.58
+No improvement in iteration 25. No improvement count: 20
+No improving move found, taking least bad move: (-1, 3), solution cost: 110.04
+No improvement in iteration 26. No improvement count: 21
+No improving move found, taking least bad move: (-1, 4), solution cost: 109.98
+No improvement in iteration 27. No improvement count: 22
+No improving move found, taking least bad move: (7, -1), solution cost: 104.31
+No improvement in iteration 28. No improvement count: 23
+No improving move found, taking least bad move: (-1, 14), solution cost: -inf
+No improvement in iteration 29. No improvement count: 24
+Traceback (most recent call last):
+  File "C:\Users\tonio\MO824\A3\MC859-A3-G03 - Copia (4)\main.py", line 55, in <module>
+    main()
+  File "C:\Users\tonio\MO824\A3\MC859-A3-G03 - Copia (4)\main.py", line 48, in main
+    solution = solver.solve()
+               ^^^^^^^^^^^^^^
+  File "C:\Users\tonio\MO824\A3\MC859-A3-G03 - Copia (4)\TabuSearch\metaheuristics\AbstractTS.py", line 254, in solve
+    self.neighborhood_move()
+  File "C:\Users\tonio\MO824\A3\MC859-A3-G03 - Copia (4)\TabuSearch\metaheuristics\TS.py", line 302, in neighborhood_move
+    best_candidate, move = self.local_search_best(neighborhood)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tonio\MO824\A3\MC859-A3-G03 - Copia (4)\TabuSearch\metaheuristics\TS.py", line 238, in local_search_best
+    print(f'No improving move found, taking least bad move: {move}, solution cost: {least_bad.cost if least_bad else "N/A":.2f}')
+                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Unknown format code 'f' for object of type 'str'
+
+--- Finished in 0.21 seconds ---
