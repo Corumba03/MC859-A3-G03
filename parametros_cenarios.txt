@@ -1,0 +1,58 @@
+Padrão:
+
+solver = TS(
+        obj_function = SC_QBF(n, A, sets),
+        no_improv_iter=30*n,
+        max_iter=2000000,
+        tenure=0,
+        constructive_type='cost_ratio',
+        search_type='first',
+        tabu_check='relaxed'
+    )
+
+
+Tenure 2:
+    solver = TS(
+        obj_function = SC_QBF(n, A, sets),
+        no_improv_iter=30*n,
+        max_iter=2000000,
+        tenure=2,
+        constructive_type='cost_ratio',
+        search_type='first',
+        tabu_check='relaxed'
+    )
+
+
+Method2:
+    solver = TS(
+        obj_function = SC_QBF(n, A, sets),
+        no_improv_iter=30*n,
+        max_iter=2000000,
+        tenure=0,
+        constructive_type='std',
+        search_type='first',
+        tabu_check='relaxed'
+    )
+
+
+Best:
+    solver = TS(
+        obj_function = SC_QBF(n, A, sets),
+        no_improv_iter=20*n,
+        max_iter=1000000,
+        tenure=0,
+        constructive_type='cost_ratio',
+        search_type='best',
+        tabu_check='relaxed'
+    )
+
+Method1:
+    solver = TS(
+        obj_function = SC_QBF(n, A, sets),
+        no_improv_iter=20*n,
+        max_iter=1000000,
+        tenure=0,
+        constructive_type='cost_ratio',
+        search_type='best',
+        tabu_check='strict'
+    )
